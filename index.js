@@ -5,6 +5,8 @@ const orderUtils = require("./orderUtils");
 const cron = require("node-cron"); // 导入cron库，注释掉以备用
 // const nodemailer = require('nodemailer');  // 导入nodemailer库，注释掉以备用
 
+const logger = require('./logger');
+
 var rsiPeriod = 14; // 用户可以在这里配置RSI计算的周期长度
 const baseUSDT = process.env.BASE_USDT; // 用户可以在这里配置每次定投的基础USDT数值，总投入
 let rsiData = []; // 全局数组存储RSI数据
@@ -117,6 +119,7 @@ async function main() {
       timezone: "Asia/Shanghai", // UTC+8
     }
   );
+
 }
 
 main();

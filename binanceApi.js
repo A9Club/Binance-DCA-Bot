@@ -51,7 +51,7 @@ async function getAccountInfo() {
         const balances = response.data.balances.filter(balance => parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0);
         return balances;
     } catch (error) {
-        console.error('获取账户信息错误：', error.message);
+        console.error('获取账户信息错误：', error.response.data.msg);
     }
 }
 
@@ -81,7 +81,7 @@ async function getKlineData(symbol, interval = '1d', limit = 14) {  // 使limit�
         });
         return response.data;
     } catch (error) {
-        console.error(`获取K线数据错误 for ${symbol}:`, error.message);
+        console.error(`获取K线数据错误 for ${symbol}:`, error.response.data.msg);
     }
 }
 
@@ -109,7 +109,7 @@ async function getCurrentPrice(symbol) {  // 新添加函数获取当前价格
         });
         return parseFloat(response.data.price);  // 返回价格作为浮点数
     } catch (error) {
-        console.error(`获取当前价格错误 for ${symbol}:`, error.message);
+        console.error(`获取当前价格错误 for ${symbol}:`, error.response.data.msg);
         return null;  // 返回null表示错误
     }
 }
@@ -191,7 +191,7 @@ async function getLotSize(symbol) {
             throw new Error('未找到指定 symbol');
         }
     } catch (error) {
-        console.error(`获取 LOT_SIZE 错误 for ${symbol}:`, error.message);
+        console.error(`获取 LOT_SIZE 错误 for ${symbol}:`, error.response.data.msg);
         return null;
     }
 }
@@ -212,7 +212,7 @@ async function testConnectivity() {
         await axios.get(`${BINANCE_API_URL}/time`);
         return true;
     } catch (error) {
-        console.error('Connectivity test failed:', error.message);
+        console.error('Connectivity test failed:', error.response.data.msg);
         return false;
     }
 }
