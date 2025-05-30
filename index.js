@@ -80,8 +80,7 @@ function printNextDCATime() {
     nextFriday.setDate(now.getDate() + ((5 + 7 - now.getDay()) % 7));
   }
   logger.info(
-    "下次定投时间:",
-    nextFriday.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
+    "下次定投时间:"+nextFriday.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
   );
 }
 
