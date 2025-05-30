@@ -27,10 +27,10 @@ async function performDCA() {
       if (rsi !== null) {
         rsiData.push({ symbol: symbol, rsi: rsi });
       } else {
-        console.log(`Not enough data to calculate RSI for ${symbol}`);
+        logger.error(`Not enough data to calculate RSI for ${symbol}`);
       }
     } else {
-      console.log(`Not enough data for ${symbol}`);
+      logger.error(`Not enough data for ${symbol}`);
     }
   }
 
@@ -44,7 +44,7 @@ async function performDCA() {
     if (actualInvestment < 5.1) {
       actualInvestment = 5.1;
     }
-    console.log(
+    logger.info(
       `币种 ${data.symbol}：分配USDT：${allocatedUSDT.toFixed(
         2
       )}，RSI：${data.rsi.toFixed(2)}，实际投入：${actualInvestment.toFixed(
@@ -54,13 +54,13 @@ async function performDCA() {
     //进行实际下单
     try {
       await orderUtils.placeOrder(data.symbol, actualInvestment);
-      // console.log(
+      // logger.info(
       //   `Successfully placed order for ${
       //     data.symbol
       //   } with amount ${actualInvestment.toFixed(2)} USDT`
       // );
     } catch (error) {
-      console.error(`Failed to place order for ${data.symbol}:`, error);
+      logger.error(`Failed to place order for ${data.symbol}:`, error);
     }
   }
 }
@@ -79,23 +79,23 @@ function printNextDCATime() {
   } else {
     nextFriday.setDate(now.getDate() + ((5 + 7 - now.getDay()) % 7));
   }
-  console.log(
+  logger.info(
     "下次定投时间:",
     nextFriday.toLocaleString("zh-CN", { timeZone: "Asia/Shanghai" })
   );
 }
 
 async function main() {
-  console.log("检查币安连接有效性");
+  logger.info("检查币安连接有效性");
   isConnect = binanceApi.testConnectivity();
 
   if (!isConnect) {
     throw new Error("无法连接币安服务器！");
   }
-  console.log("连接有效！");
-  console.log("定投程序开始运行");
+  logger.info("连接有效！");
+  logger.info("定投程序开始运行");
   const symbols = process.env.SYMBOLS.split(',').map(symbol => symbol.trim());
-  console.log("定投的币种（在env中配置）:", symbols.join(', '));
+  logger.info("定投的币种（在env中配置）:"+symbols.join(', '));
   // 在程序开始运行时调用一次获取账户信息
   await orderUtils.getAccountInfo();
   // 在程序开始运行时调用一次
@@ -105,7 +105,7 @@ async function main() {
     "30 21 * * 5",
     () => {
       // 每周五21:30，UTC+8时区
-      console.log("执行定投 at 21:30 UTC+8 on Friday");
+      logger.info("执行定投 at 21:30 UTC+8 on Friday");
       // 每次定投前调用获取账户信息
       orderUtils.getAccountInfo().then(() => {
         performDCA().then(() => {

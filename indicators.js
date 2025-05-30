@@ -1,4 +1,5 @@
 const TI = require('technicalindicators');
+const logger = require('./logger');
 
 /**
  * 计算相对强弱指数 (RSI)。
@@ -11,7 +12,7 @@ const TI = require('technicalindicators');
  * @example
  * const closes = [100, 102, 101, 105, 104]; // 示例收盘价数组
  * const rsiValue = calculateRSI(closes);
- * console.log(rsiValue); // 输出计算得到的 RSI 值
+ * logger.info(rsiValue); // 输出计算得到的 RSI 值
  */
 const calculateRSI = (closes, period = 14) => {
     const input = {

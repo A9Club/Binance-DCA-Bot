@@ -1,6 +1,7 @@
 require('dotenv').config();
 const axios = require('axios');
 const crypto = require('crypto');
+const logger = require('./logger');
 
 const API_KEY = process.env.API_KEY;
 const API_SECRET = process.env.API_SECRET;
@@ -15,7 +16,7 @@ const BINANCE_API_URL = process.env.BINANCE_API_URL;
  * @example
  * const query = 'timestamp=123456789';
  * const signature = getSignature(query);
- * console.log(signature); // 输出签名结果
+ * logger.info(signature); // 输出签名结果
  */
 function getSignature(queryString) {
     return crypto.createHmac('sha256', API_SECRET).update(queryString).digest('hex');
@@ -30,7 +31,7 @@ function getSignature(queryString) {
  * @example
  * async function main() {
  *     const balances = await getAccountInfo();
- *     console.log(balances);
+ * logger.info(balances);
  * }
  */
 async function getAccountInfo() {
@@ -51,7 +52,7 @@ async function getAccountInfo() {
         const balances = response.data.balances.filter(balance => parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0);
         return balances;
     } catch (error) {
-        console.error('获取账户信息错误：', error.response.data.msg);
+        logger.error('获取账户信息错误：', error.response.data.msg);
     }
 }
 
@@ -67,7 +68,7 @@ async function getAccountInfo() {
  * @example
  * async function main() {
  *     const data = await getKlineData('BTCUSDT', '1h', 100);
- *     console.log(data);
+ * logger.info(data);
  * }
  */
 async function getKlineData(symbol, interval = '1d', limit = 14) {  // 使limit参数可配置，默认值14
@@ -81,7 +82,7 @@ async function getKlineData(symbol, interval = '1d', limit = 14) {  // 使limit�
         });
         return response.data;
     } catch (error) {
-        console.error(`获取K线数据错误 for ${symbol}:`, error.response.data.msg);
+        logger.error(`获取K线数据错误 for ${symbol}:`, error.response.data.msg);
     }
 }
 
@@ -96,7 +97,7 @@ async function getKlineData(symbol, interval = '1d', limit = 14) {  // 使limit�
  * async function main() {
  *     const price = await getCurrentPrice('BTCUSDT');
  *     if (price !== null) {
- *         console.log(`当前价格：${price}`);
+ * logger.info(`当前价格：${price}`);
  *     }
  * }
  */
@@ -109,7 +110,7 @@ async function getCurrentPrice(symbol) {  // 新添加函数获取当前价格
         });
         return parseFloat(response.data.price);  // 返回价格作为浮点数
     } catch (error) {
-        console.error(`获取当前价格错误 for ${symbol}:`, error.response.data.msg);
+        logger.error(`获取当前价格错误 for ${symbol}:`, error.response.data.msg);
         return null;  // 返回null表示错误
     }
 }
@@ -126,7 +127,7 @@ async function getCurrentPrice(symbol) {  // 新添加函数获取当前价格
  * async function main() {
  *     const result = await buyOrder('BTCUSDT', 0.001);
  *     if (result) {
- *         console.log('买入成功：', result);
+ * logger.info('买入成功：', result);
  *     }
  * }
  */
@@ -151,7 +152,7 @@ async function buyOrder(symbol, quantity) {
         // console.log('买入订单执行：', response.data);
         return response.data;
     } catch (error) {
-        console.error('买入订单错误：', error.response.data.msg);
+        logger.error('买入订单错误：', error.response.data.msg);
     }
 }
 
@@ -166,7 +167,7 @@ async function buyOrder(symbol, quantity) {
  * async function main() {
  *     const lotSize = await getLotSize('BTCUSDT');
  *     if (lotSize) {
- *         console.log('LOT_SIZE:', lotSize);
+ * logger.info('LOT_SIZE:', lotSize);
  *     }
  * }
  */
@@ -191,7 +192,7 @@ async function getLotSize(symbol) {
             throw new Error('未找到指定 symbol');
         }
     } catch (error) {
-        console.error(`获取 LOT_SIZE 错误 for ${symbol}:`, error.response.data.msg);
+        logger.error(`获取 LOT_SIZE 错误 for ${symbol}:`, error.response.data.msg);
         return null;
     }
 }
@@ -204,7 +205,7 @@ async function getLotSize(symbol) {
  * @example
  * async function main() {
  *     const connected = await testConnectivity();
- *     console.log(connected ? 'Connected' : 'Not connected');
+ * logger.info(connected ? 'Connected' : 'Not connected');
  * }
  */
 async function testConnectivity() {
@@ -212,7 +213,7 @@ async function testConnectivity() {
         await axios.get(`${BINANCE_API_URL}/time`);
         return true;
     } catch (error) {
-        console.error('Connectivity test failed:', error.response.data.msg);
+        logger.error('Connectivity test failed:', error.response.data.msg);
         return false;
     }
 }

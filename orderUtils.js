@@ -1,10 +1,11 @@
 const binanceApi = require('./binanceApi');
+const logger = require('./logger');
 
 async function placeOrder(symbol, usdtAmount) {
   // 首先获取币种当前价格
   const price = await binanceApi.getCurrentPrice(symbol);
   if (price === null) {
-    console.log(`无法获取 ${symbol} 当前价格`);
+    logger.error(`无法获取 ${symbol} 当前价格`);
     return;
   }
   
@@ -14,7 +15,7 @@ async function placeOrder(symbol, usdtAmount) {
   // 获取币种的 lotSize 信息
   const lotSize = await binanceApi.getLotSize(symbol);
   if (lotSize === null) {
-    console.log(`无法获取 ${symbol} 的 lotSize 信息`);
+    logger.error(`无法获取 ${symbol} 的 lotSize 信息`);
     return;
   }
   
@@ -34,10 +35,10 @@ async function placeOrder(symbol, usdtAmount) {
     
     // 使用 buyOrder 函数进行下单
     await binanceApi.buyOrder(symbol, roundedQuantity);
-    console.log(`已下单买入 ${symbol}，数量：${roundedQuantity}，价格：${price}`);
+    logger.info(`已下单买入 ${symbol}，数量：${roundedQuantity}，价格：${price}`);
   } else {
     // 如果 quantity 小于该币种最低下单数量，提示用户
-    console.log(`quantity (${quantity}) 小于最低下单数量 (${lotSize.minQty})，无法下单。请检查或调整投资金额。`);
+    logger.error(`quantity (${quantity}) 小于最低下单数量 (${lotSize.minQty})，无法下单。请检查或调整投资金额。`);
   }
 }
 
@@ -47,11 +48,11 @@ async function getAccountInfo() {
   // 打印账户信息以验证，优化可读性，只输出 USDT 资产
   const usdtAsset = accountInfo.find(asset => asset.asset === 'USDT');
   if (usdtAsset) {
-    console.log(
+    logger.info(
       `资产: ${usdtAsset.asset}, 可用: ${usdtAsset.free}, 锁定: ${usdtAsset.locked}`
     );
   } else {
-    console.log("未找到 USDT 资产信息");
+    logger.error("未找到 USDT 资产信息");
   }
   return accountInfo;
 }
