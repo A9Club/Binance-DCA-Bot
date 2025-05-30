@@ -5,7 +5,10 @@ const orderUtils = require("./orderUtils");
 const cron = require("node-cron"); // 导入cron库，注释掉以备用
 // const nodemailer = require('nodemailer');  // 导入nodemailer库，注释掉以备用
 
-const logger = require('./logger');
+const logger = require("./logger");
+const express = require("express"); // 引入 Express 框架用于处理 HTTP 请求
+const app = express(); // 创建 Express 应用实例
+const { exec } = require("child_process"); // 导入 child_process 用于打开浏览器
 
 var rsiPeriod = 14; // 用户可以在这里配置RSI计算的周期长度
 const baseUSDT = process.env.BASE_USDT; // 用户可以在这里配置每次定投的基础USDT数值，总投入
@@ -13,7 +16,7 @@ let rsiData = []; // 全局数组存储RSI数据
 let accountInfo = null; // 全局变量存储账户信息
 
 async function performDCA() {
-  const symbols = process.env.SYMBOLS.split(',').map(symbol => symbol.trim());
+  const symbols = process.env.SYMBOLS.split(",").map(symbol => symbol.trim());
   const numSymbols = symbols.length; // 币种数量
   const limit = rsiPeriod + 1; // 设置limit为rsiPeriod + 1，以确保有足够数据计算RSI
   rsiData = []; // 重置RSI数据
@@ -94,8 +97,8 @@ async function main() {
   }
   logger.info("连接有效！");
   logger.info("定投程序开始运行");
-  const symbols = process.env.SYMBOLS.split(',').map(symbol => symbol.trim());
-  logger.info("定投的币种（在env中配置）:"+symbols.join(', '));
+  const symbols = process.env.SYMBOLS.split(",").map(symbol => symbol.trim());
+  logger.info("定投的币种（在env中配置）:" + symbols.join(", "));
   // 在程序开始运行时调用一次获取账户信息
   await orderUtils.getAccountInfo();
   // 在程序开始运行时调用一次
@@ -120,6 +123,27 @@ async function main() {
     }
   );
 
+  app.use(express.static("public")); // 服务静态文件，允许访问 public 目录中的前端文件
+  app.get("/api/prices", async (req, res) => {
+    const symbols = process.env.SYMBOLS.split(",").map(symbol => symbol.trim());
+    const prices = {};
+    for (const symbol of symbols) {
+      const price = await binanceApi.getCurrentPrice(symbol);
+      if (price !== null) {
+        prices[symbol] = price;
+      }
+    }
+    res.json(prices);
+  });
+  const port = 3000; // 设置端口号，可以根据需要修改
+  app.listen(port, () => {
+    logger.info(`Express 服务器运行在端口 ${port}`);
+    exec("start http://localhost:3000", error => {
+      if (error) {
+        logger.error("Failed to open browser:", error);
+      }
+    });
+  }); // 启动 Express 服务器
 }
 
 main();
