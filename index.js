@@ -7,7 +7,7 @@ const cron = require("node-cron"); // 导入cron库，注释掉以备用
 
 const logger = require('./logger');
 
-var rsiPeriod = 14; // 用户可以在这里配置RSI计算的周期长度
+var rsiPeriod = 4; // 用户可以在这里配置RSI计算的周期长度
 const baseUSDT = process.env.BASE_USDT; // 用户可以在这里配置每次定投的基础USDT数值，总投入
 let rsiData = []; // 全局数组存储RSI数据
 let accountInfo = null; // 全局变量存储账户信息
@@ -20,7 +20,7 @@ async function performDCA() {
 
   // 先获取RSI数据
   for (const symbol of symbols) {
-    const klineData = await binanceApi.getKlineData(symbol, "1d", limit);
+    const klineData = await binanceApi.getKlineData(symbol, "1w", limit);
     if (klineData && klineData.length > rsiPeriod) {
       const closes = klineData.map(candle => parseFloat(candle[4]));
       const rsi = indicators.calculateRSI(closes, rsiPeriod);
