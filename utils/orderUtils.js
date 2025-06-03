@@ -42,7 +42,6 @@ async function placeOrder(symbol, usdtAmount) {
   }
 }
 
-module.exports = { placeOrder };
 async function getAccountInfo() {
   const accountInfo = await binanceApi.getAccountInfo();
   // 打印账户信息以验证，优化可读性，只输出 USDT 资产

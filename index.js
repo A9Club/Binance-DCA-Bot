@@ -1,11 +1,11 @@
 require("dotenv").config();
-const binanceApi = require("./binanceApi");
-const indicators = require("./indicators");
-const orderUtils = require("./orderUtils");
+const binanceApi = require("./utils/binanceApi");
+const indicators = require("./utils/indicators");
+const orderUtils = require("./utils/orderUtils");
 const cron = require("node-cron"); // 导入cron库，注释掉以备用
 // const nodemailer = require('nodemailer');  // 导入nodemailer库，注释掉以备用
 
-const logger = require('./logger');
+const logger = require('./utils/logger');
 
 var rsiPeriod = 4; // 用户可以在这里配置RSI计算的周期长度
 const baseUSDT = process.env.BASE_USDT; // 用户可以在这里配置每次定投的基础USDT数值，总投入

@@ -52,7 +52,23 @@ async function getAccountInfo() {
         const balances = response.data.balances.filter(balance => parseFloat(balance.free) > 0 || parseFloat(balance.locked) > 0);
         return balances;
     } catch (error) {
-        logger.error('获取账户信息错误：', error.response.data.msg);
+        logger.error('获取账户信息错误：' + error);
+        logger.info('将在10秒后重试获取账户信息...');
+        await new Promise(resolve => setTimeout(resolve, 10000)); // 等待10秒
+        logger.info('重试获取账户信息...');
+        // 限制重试次数，避免无限循环
+        if (!this.retryCount) {
+            this.retryCount = 1;
+        } else {
+            this.retryCount++;
+        }
+        if (this.retryCount <= 3) {
+            return await getAccountInfo(); // 递归重试，最多3次
+        } else {
+            logger.error('重试次数已达上限，无法获取账户信息。');
+            this.retryCount = 0; // 重置重试次数
+            throw error; // 抛出错误，通知上层调用者
+        }
     }
 }
 
